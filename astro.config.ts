@@ -34,7 +34,7 @@ export default defineConfig({
       Icons({
         // experimental
         autoInstall: true,
-        compiler: 'astro',
+        compiler: 'solid',
       }),
     ]
   }
