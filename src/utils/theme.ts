@@ -1,4 +1,4 @@
-import type { Extension } from "@codemirror/state";
+import type { Compartment, Extension } from "@codemirror/state";
 import { createEffect, mergeProps, on } from "solid-js";
 
 export interface ThemeProps {
@@ -10,17 +10,20 @@ export interface ThemeProps {
 
 export function createTheme(
   props: ThemeProps,
-  createExtension: (extension: Extension) => (extension: Extension) => void
+  createExtension: (extension: Extension) => {
+    compartment: Compartment;
+    reconfigure: (extension: Extension) => void;
+  }
 ) {
   const merged = mergeProps({ theme: [] }, props);
 
-  const reconfigureTheme = createExtension(merged.theme);
+  const { reconfigure } = createExtension(merged.theme);
 
   createEffect(
     on(
       () => merged.theme,
       (theme) => {
-        reconfigureTheme(theme);
+        reconfigure(theme);
       },
       { defer: true }
     )

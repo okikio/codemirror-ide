@@ -6,6 +6,7 @@ import {
   StateEffect,
   type Extension,
 } from "@codemirror/state";
+import { extensions, setExtensions } from "./extensions";
 
 export interface CodeMirrorProps {
   /**
@@ -87,6 +88,8 @@ export function createCodeMirror(
    */
   function createExtension(extension: Extension) {
     const compartment = new Compartment();
+  
+    setExtensions([extensions(), compartment].flat() as Extension)
 
     onMount(() => {
       if (!view) return;
@@ -108,7 +111,7 @@ export function createCodeMirror(
       });
     }
 
-    return reconfigure;
+    return { compartment, reconfigure };
   }
 
   return { createExtension, view, state };

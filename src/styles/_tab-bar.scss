@@ -1,0 +1,13 @@
+.tab-bar {
+  @apply flex gap-2;
+  @apply w-full;
+  @apply overflow-auto;
+
+  .tab {
+    @apply flex ;
+
+    input {
+      @apply min-w-[5ch];
+    }
+  }
+}

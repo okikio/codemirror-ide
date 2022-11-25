@@ -1,14 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
 
-import { Editor } from '../components/Editor';
+import { Panel } from '../components/Panel';
 ---
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<Editor client:load value={`const x = "Hello There";\nconsole.log(x)`} />
-		<Editor client:load value={`const x = "Hello There";\nconsole.log(x)`} />
+		<Panel client:load />
+		<Panel client:load />
 	</main>
 </Layout>
 
