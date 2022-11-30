@@ -1,4 +1,4 @@
-import { type Accessor, onCleanup, onMount, on, createEffect } from "solid-js";
+import { type Accessor, onCleanup, onMount, on, createEffect, createSignal } from "solid-js";
 import { EditorView } from "@codemirror/view";
 import {
   Compartment,
@@ -37,6 +37,8 @@ export function createCodeMirror(
     doc: props.value,
   });
 
+  const [value, setValue] = createSignal(props.value);
+
   onMount(() => {
     // Construct a new EditorView instance
     view = new EditorView({
@@ -64,16 +66,16 @@ export function createCodeMirror(
 
   createEffect(
     on(
-      () => props.value,
-      (value) => {
-        if (!view || value === view.state.doc.toString()) {
+      value,
+      (val) => {
+        if (!view || val === view.state.doc.toString()) {
           return;
         }
         view.dispatch({
           changes: {
             from: 0,
             to: view.state.doc.length,
-            insert: value,
+            insert: val,
           },
         });
       },
@@ -114,5 +116,5 @@ export function createCodeMirror(
     return { compartment, reconfigure };
   }
 
-  return { createExtension, view, state };
+  return { createExtension, view, state, value, setValue };
 }

@@ -1,15 +1,14 @@
 import { javascript } from "@codemirror/lang-javascript";
-import { createContext, useContext, ParentComponent } from "solid-js";
 import { createStore } from "solid-js/store";
 import { createModel, type IModel } from "./model";
 
-export type TabListContextState = {
+export type TabListState = {
   list: IModel[];
   active: number;
 };
 
-export type TabListContextValue = [
-  state: Readonly<TabListContextState>,
+export type TabListValue = [
+  state: Readonly<TabListState>,
   actions: {
     addTab: (model: IModel) => void;
     removeTab: (index: number) => void;
@@ -17,7 +16,7 @@ export type TabListContextValue = [
   }
 ];
 
-const defaultState: TabListContextState = {
+const defaultState: TabListState = {
   list: [
     createModel(
       "String",
@@ -31,33 +30,19 @@ const defaultState: TabListContextState = {
   active: 0,
 };
 
-const TabListContext = createContext<TabListContextValue>([
-  defaultState,
-  {
-    addTab: () => undefined,
-    removeTab: () => undefined,
-    setActive: () => undefined,
-  },
-]);
-
-export const TabListProvider: ParentComponent<Partial<TabListContextState>> = (props) => {
-  const [state, setState] = createStore<TabListContextState>({
+export function createTabList(props: Partial<TabListState> = {}) {
+  const [state, setState] = createStore<TabListState>({
     list: props.list ?? defaultState.list,
     active: props.active ?? defaultState.active,
   });
 
   const addTab = (model: IModel) => setState("list", [...state.list, model]);
-  const removeTab = (index: number) => setState("list", [
-    ...state.list.slice(0, index), 
-    ...state.list.slice(index)
-  ]);
+  const removeTab = (index: number) => {
+    return setState("list", [
+      ...state.list.slice(0, index),
+      ...state.list.slice(index + 1),
+    ]);
+  }
   const setActive = (index: number) => setState("active", index);
-
-  return (
-    <TabListContext.Provider value={[state, { addTab, removeTab, setActive }]}>
-      {props.children}
-    </TabListContext.Provider>
-  );
-};
-
-export const useTabList = () => useContext(TabListContext);
+  return [state, { addTab, removeTab, setActive }] as const;
+}

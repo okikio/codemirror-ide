@@ -1,13 +1,15 @@
 .tab-bar {
-  @apply flex gap-2;
+  @apply flex items-center;
+  @apply gap-2;
   @apply w-full;
   @apply overflow-auto;
 
   .tab {
-    @apply flex ;
+    @apply flex items-center;
+    @apply px-2 py-1;
 
     input {
-      @apply min-w-[5ch];
+      @apply w-[10ch];
     }
   }
 }

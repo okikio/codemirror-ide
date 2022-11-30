@@ -1,15 +1,16 @@
-import type { ComponentProps, Setter } from "solid-js";
-import { useTabList } from "../utils/tabs";
+import type { ComponentProps } from "solid-js";
+import type { createTabList } from "../utils/tabs";
 import { Button } from "./Button";
 
 export interface TabProps {
   name?: string;
   pinned?: boolean;
   index: number;
+  tabsListState: ReturnType<typeof createTabList>;
 }
 
 export function Tab(props: ComponentProps<'div'> & TabProps) {
-  const [, { setActive, removeTab }] = useTabList();
+  const [, { setActive, removeTab }] = props.tabsListState;
   return (
     <Button class="tab" onClick={() => {
       setActive(props.index);

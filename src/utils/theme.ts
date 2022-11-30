@@ -16,7 +16,6 @@ export function createTheme(
   }
 ) {
   const merged = mergeProps({ theme: [] }, props);
-
   const { reconfigure } = createExtension(merged.theme);
 
   createEffect(

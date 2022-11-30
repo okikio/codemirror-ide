@@ -4,7 +4,6 @@ import { createEffect, mergeProps, on } from "solid-js";
 
 export const [extensions, setExtensions] = createSignal<Extension>([]);
 
-
 export interface ExtensionsProps {
   /**
    * An array of CodeMirror extensions to use

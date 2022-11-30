@@ -1,23 +1,19 @@
 import type { LanguageSupport } from "@codemirror/language";
-import { EditorState, type Text, type Extension } from "@codemirror/state";
-import { extensions } from "./extensions";
 
 export interface IModel {
   url: URL | string;
-  state: EditorState;
+  value: string;
+  lang: LanguageSupport
 }
 
 export function createModel(
-  value: string | Text,
+  value: string,
   lang: LanguageSupport,
   url: URL | string
 ): IModel {
-  const state = EditorState.create({
-    doc: value,
-    extensions: [lang, extensions()] as Extension, // extensions
-  });
   return {
     url: url.toString(),
-    state,
+    value,
+    lang
   };
 }
