@@ -2,5 +2,4 @@
 export {}
 declare global {
   const IconFluentAdd24Filled: typeof import('~icons/fluent/add24-filled.jsx')['default']
-  const IconFluentEmojiFaceWithTearsOfJoys: typeof import('~icons/fluent-emoji/face-with-tears-of-joys.jsx')['default']
 }

@@ -7,12 +7,13 @@ import {
   createSignal,
   mergeProps,
   on,
+  onMount,
 } from "solid-js";
 
 import type { CodeMirrorProps } from "../utils/codemirror";
 import { createCodeMirror } from "../utils/codemirror";
 
-import { basicSetup } from "codemirror";
+import { basicSetup, EditorView } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 
 import { TabList } from "./TabList";
@@ -29,6 +30,7 @@ import { StateEffect } from "@codemirror/state";
 import { ChangeSet } from "@codemirror/state";
 import { Text } from "@codemirror/state";
 import { createStore } from "solid-js/store";
+import { EditorState } from "@codemirror/state";
 
 export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
   let ref: HTMLDivElement | undefined;
@@ -38,44 +40,27 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
     "onEditorMount",
   ]);
 
-  const tabsListState = createTabList();
+  const tabsListState = createTabList({
+    initialValue: props.value,
+  });
   const [tabs, { setState: setTabState }] = tabsListState;
 
   const initialValue = codemirrorProps.value;
-  const { createExtension, getState, getView, setValue } = createCodeMirror(
-    mergeProps(
-      {
-        onValueChange(value, tr) {
-        // console.log(tr.changes);
-          const activeTab = tabs.list[tabs.active];
-          setTabState("list", tabs.active, "transactions", (prev) => [
-            ...prev,
-            tr,
-            // tr.changes
-            // activeTab.state.changes({
-            //   from: 0,
-            //   insert: value,
-            // })
-          ]);
-          // console.log(activeTab.changes);
-          
-          // );
-        },
-      } as CodeMirrorProps,
-      codemirrorProps
-    ),
+  const { createExtension, getState, getView } = createCodeMirror(
+    codemirrorProps,
     () => ref
   );
 
-  const theme = createExtension(githubDark);
-  const basic = createExtension(basicSetup);
-  const lang = createExtension(
-    javascript({
-      jsx: true,
-      typescript: true,
+  const themeExt = createExtension(githubDark);
+  const basicExt = createExtension(basicSetup);
+  const updateExt = createExtension(
+    EditorView.updateListener.of((update) => {
+      setTabState("list", tabs.active, "state", update.state);
+      update.view.setState(update.state);
     })
   );
 
+  let initial: number[] = [];
   createEffect(
     on(
       () => tabs.active,
@@ -84,25 +69,20 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
         if (!view) return;
 
         const activeTab = tabs.list[tabs.active];
-
-        // setValue(activeTab.state.doc.toString());
-        view.setState(activeTab.state);
-
-        console.log(activeTab.transactions);
-        // activeTab.changes.forEach(tr => view.dispatch(tr));
-        view.update(activeTab.transactions)
-        view.dispatch({
-          // changes: activeTab.transactions,
-          effects: [
-            StateEffect.appendConfig.of(theme.compartment.of(githubDark)),
-            StateEffect.appendConfig.of(basic.compartment.of(basicSetup)),
-            StateEffect.appendConfig.of(lang.compartment.of(activeTab.lang)),
+        const state = EditorState.create({
+          doc: activeTab.value,
+          extensions: [
+            themeExt.extension,
+            basicExt.extension,
+            activeTab.lang,
+            updateExt.extension,
           ],
         });
+        setTabState("list", tabs.active, "state", state);
         
-        console.log({
-          state: activeTab.state,
-        });
+        if (activeTab.state) {
+          view.setState(activeTab?.state);
+        }
       }
     )
   );

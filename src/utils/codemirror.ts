@@ -34,32 +34,14 @@ export function createCodeMirror(
 ) {
   const [getValue, setValue] = createSignal(props.value);
   const [getView, setView] = createSignal<EditorView | undefined>();
-  const [getState, setState] = createSignal(
-    EditorState.create({
-      doc: props.value,
-    })
-  );
+  const [getState, setState] = createSignal();
 
   onMount(() => {
     setView(
       new EditorView({
-        state: getState(),
-        parent: ref(),
-        dispatch(tr) {
-          const view = getView();
-          if (!view) return;
-
-          view.update([tr]);
-
-          if (tr.docChanged) {
-            const newCode = tr.newDoc.sliceString(0, tr.newDoc.length);
-            props.onValueChange?.(newCode, tr);
-          }
-        },
+        parent: ref()
       })
     );
-
-    props.onEditorMount?.(getView() as EditorView);
 
     onCleanup(() => {
       const view = getView();
@@ -83,6 +65,18 @@ export function createCodeMirror(
             insert: val,
           },
         });
+      },
+      { defer: true }
+    )
+  );
+
+  createEffect(
+    on(
+      () => getView()?.state,
+      (val) => {
+        const view = getView();
+        if (!view) return;
+        setState(view.state);
       },
       { defer: true }
     )
@@ -120,7 +114,7 @@ export function createCodeMirror(
       });
     }
 
-    return { compartment, reconfigure };
+    return { compartment, reconfigure, extension };
   }
 
   return { createExtension, getState, setState, getValue, setValue, getView, setView };

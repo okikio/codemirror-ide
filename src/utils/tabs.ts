@@ -3,37 +3,33 @@ import { createStore } from "solid-js/store";
 import { createModel, type IModel } from "./model";
 
 export type TabListState = {
+  initialValue: string;
   list: IModel[];
   active: number;
 };
 
-export type TabListValue = [
-  state: Readonly<TabListState>,
-  actions: {
-    addTab: (model: IModel) => void;
-    removeTab: (index: number) => void;
-    setActive: (index: number) => void;
-  }
-];
-
-const defaultState: TabListState = {
-  list: [
-    createModel(
-      `const x = \`./test.ts\`;\nconsole.log(x)`,
-      javascript({
-        jsx: true,
-        typescript: true,
-      }),
-      "./test.ts"
-    ),
-  ],
-  active: 0,
-};
+export type TabListValue = ReturnType<typeof createTabList>;
 
 export function createTabList(props: Partial<TabListState> = {}) {
+  const initialValue = props.initialValue ?? `console.log("Initial State")`
+  const defaultState: TabListState = {
+    initialValue: initialValue,
+    list: [
+      createModel(
+        initialValue,
+        javascript({
+          jsx: true,
+          typescript: true,
+        }),
+        "./test.ts"
+      )],
+    active: 0,
+  };
+
   const [state, setState] = createStore<TabListState>({
     list: props.list ?? defaultState.list,
     active: props.active ?? defaultState.active,
+    initialValue: initialValue
   });
 
   const addTab = (model: IModel) => setState("list", [...state.list, model]);
