@@ -45,21 +45,20 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
   const { createExtension, getState, getView, setValue } = createCodeMirror(
     mergeProps(
       {
-        onValueChange(value) {
+        onValueChange(value, tr) {
+        // console.log(tr.changes);
           const activeTab = tabs.list[tabs.active];
-          // setTabState(
-          //   "list",
-          //   tabs.active,
-          //   "changes",
-          //   activeTab.state.changes(getState().changes())
-          // );
+          setTabState("list", tabs.active, "transactions", (prev) => [
+            ...prev,
+            tr,
+            // tr.changes
+            // activeTab.state.changes({
+            //   from: 0,
+            //   insert: value,
+            // })
+          ]);
           // console.log(activeTab.changes);
-          // getState().update(activeTab.state.update({
-          //   changes: {
-          //     from: 0,
-          //     insert: value,
-          //   },
-          // })
+          
           // );
         },
       } as CodeMirrorProps,
@@ -89,9 +88,11 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
         // setValue(activeTab.state.doc.toString());
         view.setState(activeTab.state);
 
-        console.log(activeTab.changes);
+        console.log(activeTab.transactions);
+        // activeTab.changes.forEach(tr => view.dispatch(tr));
+        view.update(activeTab.transactions)
         view.dispatch({
-          changes: activeTab.changes,
+          // changes: activeTab.transactions,
           effects: [
             StateEffect.appendConfig.of(theme.compartment.of(githubDark)),
             StateEffect.appendConfig.of(basic.compartment.of(basicSetup)),

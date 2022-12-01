@@ -4,6 +4,7 @@ import {
   Compartment,
   EditorState,
   StateEffect,
+  Transaction,
   type Extension,
 } from "@codemirror/state";
 
@@ -15,7 +16,7 @@ export interface CodeMirrorProps {
   /**
    * Called whenever the editor code value changes.
    */
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string, transaction: Transaction) => void;
   /**
    * Called when the editor first mounts, receiving the current EditorView instance.
    */
@@ -52,7 +53,7 @@ export function createCodeMirror(
 
           if (tr.docChanged) {
             const newCode = tr.newDoc.sliceString(0, tr.newDoc.length);
-            props.onValueChange?.(newCode);
+            props.onValueChange?.(newCode, tr);
           }
         },
       })

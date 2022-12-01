@@ -1,12 +1,12 @@
 import type { LanguageSupport } from "@codemirror/language";
-import type { ChangeSpec } from "@codemirror/state";
+import type { ChangeSpec, Transaction, TransactionSpec } from "@codemirror/state";
 import { EditorState } from "@codemirror/state";
 
 export interface IModel {
   url: URL | string;
   value: string;
   state: EditorState;
-  changes: ChangeSpec;
+  transactions: Transaction[];
   lang: LanguageSupport
 }
 
@@ -23,7 +23,7 @@ export function createModel(
     url: url.toString(),
     value,
     state,
-    changes: [],
+    transactions: [],
     lang
   };
 }
