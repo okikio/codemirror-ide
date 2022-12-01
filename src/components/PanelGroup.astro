@@ -14,16 +14,14 @@ export interface Props {
 <style lang="scss">
   .panel-group {
     @apply grid;
+    @apply w-full h-full;
 
     &.row {
       grid-template-rows: repeat(auto-fill, max-content);
-      @apply h-full;
     }
 
     &.col {
-      // grid-template-columns: repeat(auto-fill);
       grid-template-columns: repeat(auto-fill, 50%);
-      // @apply w-full;
     }
   }
 </style>

@@ -20,19 +20,19 @@ export function TabList(
   return (
     <div class="tab-bar">
       <div class="tab-list">
-      <For each={tabs.list}>
-        {(value, index) => (
-          <Tab
-            name={value.url.toString()}
-            index={index()}
-            tabsListState={props?.tabsListState}
-          />
-        )}
-      </For>
+        <For each={tabs.list}>
+          {(value, index) => (
+            <Tab
+              name={value.url.toString()}
+              index={index()}
+              tabsListState={props?.tabsListState}
+            />
+          )}
+        </For>
       </div>
-      
+
       <Button
-      class="add-tab-btn"
+        class="add-tab-btn"
         onClick={() => {
           const model = createModel(
             `const x = \`./test${tabs.list.length + 1}.ts\`;\nconsole.log(x)`,

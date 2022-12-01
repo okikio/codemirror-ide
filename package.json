@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@iconify-json/fluent": "^1.1.17",
+    "@iconify-json/fluent-emoji": "^1.1.7",
     "astro": "^1.6.12",
     "sass": "^1.56.1",
     "unplugin-auto-import": "^0.12.0",

@@ -22,7 +22,7 @@ import { mergeRefs } from "@solid-primitives/refs";
 import { createTabList } from "../utils/tabs";
 
 import { githubLight } from "@ddietr/codemirror-themes/github-light";
-import { githubDark } from "@ddietr/codemirror-themes/github-dark";
+import { githubDark, config } from "@ddietr/codemirror-themes/github-dark";
 import { oneDark } from "@codemirror/theme-one-dark";
 
 import { StateEffect } from "@codemirror/state";
@@ -107,9 +107,16 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
   );
 
   return (
-    <div>
+    <div class="flex flex-col w-full h-full">
       <TabList state={getState()} tabsListState={tabsListState} />
-      <div ref={mergeRefs((el) => (ref = el), props.ref)} {...others} />
+      <div
+        class={`flex-grow`}
+        style={{
+          "background-color": config.background,
+        }}
+        ref={mergeRefs((el) => (ref = el), props.ref)}
+        {...others}
+      />
     </div>
   );
 }
