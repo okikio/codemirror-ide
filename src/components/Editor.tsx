@@ -110,7 +110,7 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
     <div class="flex flex-col w-full h-full">
       <TabList state={getState()} tabsListState={tabsListState} />
       <div
-        class={`flex-grow`}
+        class={`w-full h-full overflow-auto`}
         style={{
           "background-color": config.background,
         }}
