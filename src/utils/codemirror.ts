@@ -6,7 +6,6 @@ import {
   StateEffect,
   type Extension,
 } from "@codemirror/state";
-import { extensions, setExtensions } from "./extensions";
 
 export interface CodeMirrorProps {
   /**
@@ -32,33 +31,37 @@ export function createCodeMirror(
   props: CodeMirrorProps,
   ref: Accessor<HTMLDivElement | undefined>
 ) {
-  let view: EditorView | undefined;
-  const state = EditorState.create({
-    doc: props.value,
-  });
-
-  const [value, setValue] = createSignal(props.value);
+  const [getValue, setValue] = createSignal(props.value);
+  const [getView, setView] = createSignal<EditorView | undefined>();
+  const [getState, setState] = createSignal(
+    EditorState.create({
+      doc: props.value,
+    })
+  );
 
   onMount(() => {
-    // Construct a new EditorView instance
-    view = new EditorView({
-      state,
-      parent: ref(),
-      dispatch: (tr): void => {
-        if (!view) return;
+    setView(
+      new EditorView({
+        state: getState(),
+        parent: ref(),
+        dispatch(tr) {
+          const view = getView();
+          if (!view) return;
 
-        view.update([tr]);
+          view.update([tr]);
 
-        if (tr.docChanged) {
-          const newCode = tr.newDoc.sliceString(0, tr.newDoc.length);
-          props.onValueChange?.(newCode);
-        }
-      },
-    });
+          if (tr.docChanged) {
+            const newCode = tr.newDoc.sliceString(0, tr.newDoc.length);
+            props.onValueChange?.(newCode);
+          }
+        },
+      })
+    );
 
-    props.onEditorMount?.(view);
+    props.onEditorMount?.(getView() as EditorView);
 
     onCleanup(() => {
+      const view = getView();
       if (!view) return;
       view.destroy();
     });
@@ -66,8 +69,9 @@ export function createCodeMirror(
 
   createEffect(
     on(
-      value,
+      getValue,
       (val) => {
+        const view = getView();
         if (!view || val === view.state.doc.toString()) {
           return;
         }
@@ -90,10 +94,11 @@ export function createCodeMirror(
    */
   function createExtension(extension: Extension) {
     const compartment = new Compartment();
-  
-    setExtensions([extensions(), compartment].flat() as Extension)
+
+    // setExtensions([extensions(), compartment].flat() as Extension)
 
     onMount(() => {
+      const view = getView();
       if (!view) return;
 
       view.dispatch({
@@ -106,6 +111,7 @@ export function createCodeMirror(
      * @param extension the extension to reconfigure the extension compartment with.
      */
     function reconfigure(extension: Extension) {
+      const view = getView();
       if (!view) return;
 
       view.dispatch({
@@ -116,5 +122,5 @@ export function createCodeMirror(
     return { compartment, reconfigure };
   }
 
-  return { createExtension, view, state, value, setValue };
+  return { createExtension, getState, setState, getValue, setValue, getView, setView };
 }

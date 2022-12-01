@@ -1,6 +1,13 @@
 // import type { Props as CodeMirrorProps } from "@solid-codemirror/codemirror";
 // import { CodeMirror } from "@solid-codemirror/codemirror";
-import { type ComponentProps, createEffect, splitProps, createSignal, mergeProps } from "solid-js";
+import {
+  type ComponentProps,
+  createEffect,
+  splitProps,
+  createSignal,
+  mergeProps,
+  on,
+} from "solid-js";
 
 import type { CodeMirrorProps } from "../utils/codemirror";
 import { createCodeMirror } from "../utils/codemirror";
@@ -11,8 +18,6 @@ import { javascript } from "@codemirror/lang-javascript";
 import { TabList } from "./TabList";
 
 import { mergeRefs } from "@solid-primitives/refs";
-import { createExtensions, extensions, setExtensions } from "../utils/extensions";
-import { createTheme } from "../utils/theme";
 
 import { createTabList } from "../utils/tabs";
 
@@ -25,7 +30,7 @@ import { ChangeSet } from "@codemirror/state";
 import { Text } from "@codemirror/state";
 import { createStore } from "solid-js/store";
 
-export function Editor(props: ComponentProps<'div'> & CodeMirrorProps) {
+export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
   let ref: HTMLDivElement | undefined;
   const [codemirrorProps, others] = splitProps(props, [
     "value",
@@ -33,53 +38,82 @@ export function Editor(props: ComponentProps<'div'> & CodeMirrorProps) {
     "onEditorMount",
   ]);
 
+  const tabsListState = createTabList();
+  const [tabs, { setState: setTabState }] = tabsListState;
+
   const initialValue = codemirrorProps.value;
-  const { createExtension, state, view, value, setValue } = createCodeMirror(
+  const { createExtension, getState, getView, setValue } = createCodeMirror(
     mergeProps(
       {
-        onEditorMount() {
-          // setValue(initialValue);
+        onValueChange(value) {
+          const activeTab = tabs.list[tabs.active];
+          setTabState(
+            "list",
+            tabs.active,
+            "changes",
+            activeTab.state.changes(getState().changes())
+          );
+          console.log(activeTab.changes);
+          // getState().update(activeTab.state.update({
+          //   changes: {
+          //     from: 0,
+          //     insert: value,
+          //   },
+          // })
+          // );
         },
-        onValueChange(val: string) {
-        }
-      },
+      } as CodeMirrorProps,
       codemirrorProps
     ),
     () => ref
   );
 
-  createTheme({ theme: githubDark }, createExtension);
-  createExtensions({ extensions: basicSetup }, createExtension);
-  createExtension(
+  const theme = createExtension(githubDark);
+  const basic = createExtension(basicSetup);
+  const lang = createExtension(
     javascript({
       jsx: true,
       typescript: true,
     })
   );
-  // createExtensions({ extensions: extensions() }, createExtension); 
 
-  const tabsListState = createTabList();
-  const [tabs, { addTab }] = tabsListState;
+  createEffect(
+    on(
+      () => tabs.active,
+      () => {
+        const view = getView();
+        if (!view) return;
 
-  createEffect(() => {
+        const activeTab = tabs.list[tabs.active];
+        // createExtensions({ extensions: extensions() }, createExtension);
 
-          const activeTab = tabs.list[tabs.active];
-          activeTab.value = state.doc.toString();
+        // setValue(activeTab.state.doc.toString());
+        view.setState(activeTab.state);
 
-          let transaction = state.update({
-            changes: { from: 0, insert: activeTab.value, to: state.doc.length },
-          });
+        // theme.reconfigure(githubDark);
+        // basic.reconfigure(basicSetup);
+        // lang.reconfigure(activeTab.lang);
 
-          // At this point the view still shows the old state.
-          if (transaction) {
-            console.log(transaction?.state.doc.toString()); // "0123"
-            setValue(activeTab.value);
-          }
-  });
+        console.log(activeTab.changes);
+        view.dispatch({
+          changes: activeTab.changes,
+          effects: [
+            StateEffect.appendConfig.of(theme.compartment.of(githubDark)),
+            StateEffect.appendConfig.of(basic.compartment.of(basicSetup)),
+            StateEffect.appendConfig.of(lang.compartment.of(activeTab.lang)),
+          ],
+        });
+        
+        console.log({
+          state: activeTab.state,
+        });
+      }
+    )
+  );
 
   return (
     <div>
-      <TabList state={state} tabsListState={tabsListState} />
+      <TabList state={getState()} tabsListState={tabsListState} />
       <div ref={mergeRefs((el) => (ref = el), props.ref)} {...others} />
     </div>
   );

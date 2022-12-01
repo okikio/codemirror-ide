@@ -44,5 +44,5 @@ export function createTabList(props: Partial<TabListState> = {}) {
     ]);
   }
   const setActive = (index: number) => setState("active", index);
-  return [state, { addTab, removeTab, setActive }] as const;
+  return [state, { addTab, removeTab, setActive, setState }] as const;
 }
