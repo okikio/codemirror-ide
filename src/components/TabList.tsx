@@ -16,9 +16,10 @@ export function TabList(
     tabsListState: ReturnType<typeof createTabList>;
   } 
 ) {
-  const [tabs, { addTab }] = props?.tabsListState;
+  const [tabs, { addTab, setActive }] = props?.tabsListState;
   return (
     <div class="tab-bar">
+      <div class="tab-list">
       <For each={tabs.list}>
         {(value, index) => (
           <Tab
@@ -28,11 +29,13 @@ export function TabList(
           />
         )}
       </For>
+      </div>
       
       <Button
+      class="add-tab-btn"
         onClick={() => {
           const model = createModel(
-            "Another ",
+            `const x = \`./test${tabs.list.length + 1}.ts\`;\nconsole.log(x)`,
             javascript({
               jsx: true,
               typescript: true,
@@ -41,6 +44,7 @@ export function TabList(
           );
 
           addTab(model);
+          setActive(tabs.list.length - 1);
         }}
       >
         <IconFluentAdd24Filled />

@@ -47,13 +47,13 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
       {
         onValueChange(value) {
           const activeTab = tabs.list[tabs.active];
-          setTabState(
-            "list",
-            tabs.active,
-            "changes",
-            activeTab.state.changes(getState().changes())
-          );
-          console.log(activeTab.changes);
+          // setTabState(
+          //   "list",
+          //   tabs.active,
+          //   "changes",
+          //   activeTab.state.changes(getState().changes())
+          // );
+          // console.log(activeTab.changes);
           // getState().update(activeTab.state.update({
           //   changes: {
           //     from: 0,
@@ -85,14 +85,9 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
         if (!view) return;
 
         const activeTab = tabs.list[tabs.active];
-        // createExtensions({ extensions: extensions() }, createExtension);
 
         // setValue(activeTab.state.doc.toString());
         view.setState(activeTab.state);
-
-        // theme.reconfigure(githubDark);
-        // basic.reconfigure(basicSetup);
-        // lang.reconfigure(activeTab.lang);
 
         console.log(activeTab.changes);
         view.dispatch({

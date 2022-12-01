@@ -1,0 +1,29 @@
+---
+export interface Props {
+  /**
+   * Direction of panels
+   */
+  dir?: "row" | "col"
+}
+---
+
+<div class:list={["panel-group", Astro.props.dir]}>
+  <slot />
+</div>
+
+<style lang="scss">
+  .panel-group {
+    @apply grid;
+
+    &.row {
+      grid-template-rows: repeat(auto-fill, max-content);
+      @apply h-full;
+    }
+
+    &.col {
+      // grid-template-columns: repeat(auto-fill);
+      grid-template-columns: repeat(auto-fill, 50%);
+      // @apply w-full;
+    }
+  }
+</style>

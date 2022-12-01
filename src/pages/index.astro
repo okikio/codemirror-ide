@@ -2,12 +2,21 @@
 import Layout from '../layouts/Layout.astro';
 
 import { Panel } from '../components/Panel';
+import PanelGroup from '../components/PanelGroup.astro';
 ---
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<Panel client:only />
-		<Panel client:only />
+		<PanelGroup>
+			<PanelGroup dir="row">
+				<Panel client:only />
+				<Panel client:only />
+			</PanelGroup>
+			<PanelGroup dir="col">
+				<Panel client:only />
+				<Panel client:only />
+		</PanelGroup>
+	</PanelGroup>
 	</main>
 </Layout>
 

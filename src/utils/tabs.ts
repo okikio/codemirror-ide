@@ -19,7 +19,7 @@ export type TabListValue = [
 const defaultState: TabListState = {
   list: [
     createModel(
-      "String",
+      `const x = \`./test.ts\`;\nconsole.log(x)`,
       javascript({
         jsx: true,
         typescript: true,

@@ -2,14 +2,31 @@
   @apply flex items-center;
   @apply gap-2;
   @apply w-full;
-  @apply overflow-auto;
+
+  .tab-list {
+    @apply overflow-auto;
+    @apply inline-flex;
+    @apply gap-[inherit];
+  }
 
   .tab {
     @apply flex items-center;
     @apply px-2 py-1;
 
-    input {
-      @apply w-[10ch];
+    & > div {
+      @apply flex;
+      @apply min-w-[10ch];
+      @apply max-w-[200px];
     }
+
+    &.active {
+      @apply bg-blue-300;
+    }
+  }
+
+  .tab,
+  .add-tab-btn,
+  .close-tab-btn {
+    flex-shrink: 0;
   }
 }
