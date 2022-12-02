@@ -33,8 +33,8 @@ export function createCodeMirror(
   ref: Accessor<HTMLDivElement | undefined>
 ) {
   const [getValue, setValue] = createSignal(props.value);
-  const [getView, setView] = createSignal<EditorView | undefined>();
-  const [getState, setState] = createSignal();
+  const [getView, setView] = createSignal<EditorView | null | undefined>(null);
+  const [getState, setState] = createSignal<EditorState | null | undefined>(null);
 
   onMount(() => {
     setView(

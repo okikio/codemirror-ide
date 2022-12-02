@@ -1,7 +1,5 @@
-// import type { Props as CodeMirrorProps } from "@solid-codemirror/codemirror";
-// import { CodeMirror } from "@solid-codemirror/codemirror";
+import type { ComponentProps } from "solid-js";
 import {
-  type ComponentProps,
   createEffect,
   splitProps,
   createSignal,
@@ -55,12 +53,13 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
   const basicExt = createExtension(basicSetup);
   const updateExt = createExtension(
     EditorView.updateListener.of((update) => {
-      setTabState("list", tabs.active, "state", update.state);
-      update.view.setState(update.state);
+      const activeTab = tabs.list[tabs.active];
+      if (activeTab.state) {
+        setTabState("list", tabs.active, "state", update.state);
+      }
     })
   );
 
-  let initial: number[] = [];
   createEffect(
     on(
       () => tabs.active,
@@ -69,19 +68,22 @@ export function Editor(props: ComponentProps<"div"> & CodeMirrorProps) {
         if (!view) return;
 
         const activeTab = tabs.list[tabs.active];
-        const state = EditorState.create({
-          doc: activeTab.value,
-          extensions: [
-            themeExt.extension,
-            basicExt.extension,
-            activeTab.lang,
-            updateExt.extension,
-          ],
-        });
-        setTabState("list", tabs.active, "state", state);
-        
+        if (!activeTab.state) {
+          const state = EditorState.create({
+            doc: activeTab.value,
+            extensions: [
+              themeExt.extension,
+              basicExt.extension,
+              activeTab.lang,
+              updateExt.extension,
+            ],
+          });
+          
+          setTabState("list", tabs.active, "state", state);
+        }
+
         if (activeTab.state) {
-          view.setState(activeTab?.state);
+          view.setState(activeTab.state);
         }
       }
     )

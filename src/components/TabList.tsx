@@ -12,7 +12,7 @@ import { createModel } from "../utils/model";
 
 export function TabList(
   props: ComponentProps<"div"> & {
-    state?: EditorState;
+    state?: EditorState | null;
     tabsListState: ReturnType<typeof createTabList>;
   } 
 ) {
